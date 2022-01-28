@@ -7,23 +7,38 @@ import { Text, Image, View, StyleSheet, ScrollView, Button, Alert } from 'react-
 import ScrollViewExample from './ScrollViewExample.js'
 import RNLocation from 'react-native-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isSearchBarAvailableForCurrentPlatform } from 'react-native-screens';
 // import AsyncStorage from '@react-native-community/async-storage';
 
-const Home = () => {
+const Home =  ({ navigation }) => {
 
   const [pointList, setPointList] = useState();
   const [count, setCount] = useState()
   const [user_id, setUserId] = useState()
 
-    AsyncStorage.getItem("user_id").then(value =>{ console.log(value); setUserId(value);})
+  AsyncStorage.getItem("user_id").then(value => { console.log(value); setUserId(value); })
+
+  const  login =() => {
+  console.log("navigate")
+   setCount(c => c + 1);
+     console.log("mehme")
+  }
+
+  const logout =() => {
+       AsyncStorage.clear();
+       navigation.navigate('App');
+  }
+  
   useEffect(() => {
-  //  Alert.alert(AsyncStorage.getItem("user_id"))
-    console.log("merhaba");
-    setCount(count + 1);
+    navigation.setOptions({
+      headerLeft: () => <Button title={"Çıkış"} onPress={logout} />,
+      headerRight: () => (
+        <Button onPress={login} title="Ekle" />
+      ),
+    });
     if (pointList === undefined || null) {
       pointListGet();
     }
-    console.log(pointList)
   }, [pointList])
 
 
@@ -35,19 +50,20 @@ const Home = () => {
 
 
   const locationPost = (location) => {
+    console.log("locationPost");
+    console.log(location);
     fetch('http://178.18.200.116:90/api/PointList/PointUpdate', {
       method: 'POST',
-      body: location,
+      body: JSON.stringify(location),
       headers: {
         //Header Defination
-        'Content-Type':
-          'application/x-www-form-urlencoded;charset=UTF-8',
+        'Content-Type': 'application/json',
       },
     })
       .then((response) => response.json())
       .then((responseJson) => {
+        console.log("locationPost");
         console.log(responseJson)
-        AsyncStorage.setItem('user_id',JSON.stringify("mehmet"));
         // //Hide Loader
         // setLoading(false);
         // console.log(responseJson);
@@ -71,40 +87,60 @@ const Home = () => {
   }
 
   const GetLocation = (id) => {
-    RNLocation.configure({
-      distanceFilter: 5.0
-    })
+    console.log("GetLocation")
+    try {
 
-    RNLocation.requestPermission({
-      ios: "whenInUse",
-      android: {
-        detail: "coarse"
-      }
-    }).then(granted => {
-      if (granted) {
-        RNLocation.subscribeToLocationUpdates(locations => {
-          /* Example location returned
-          {
-            speed: -1,
-            longitude: -0.1337,
-            latitude: 51.50998,
-            accuracy: 5,
-            heading: -1,
-            altitude: 0,
-            altitudeAccuracy: -1
-            floor: 0
-            timestamp: 1446007304457.029,
-            fromMockProvider: false
-          }
-          */
+      RNLocation.configure({
+        distanceFilter: 1.0
+      })
 
-          console.log(parseInt("156688"))
-          const location = { "id": user_id, "latitude": locations.latitude, "longitude": locations.longitude };
-          locationPost(location)
-          console.log(locations)
-        })
-      }
-    })
+      RNLocation.requestPermission({
+        ios: "whenInUse",
+        android: {
+          detail: "coarse"
+        }
+      }).then(granted => {
+
+        if (granted) {
+          // const aa = RNLocation.getLatestLocation(y => { console.log(y); console.log("aaassa") });
+          // console.log(aa);
+
+          RNLocation.subscribeToLocationUpdates(locations => {
+            console.log("GetLocation-2")
+            // console.log(locations)
+
+            /* Example location returned
+            {
+              speed: -1,
+              longitude: -0.1337,
+              latitude: 51.50998,
+              accuracy: 5,
+              heading: -1,
+              altitude: 0,
+              altitudeAccuracy: -1
+              floor: 0
+              timestamp: 1446007304457.029,
+              fromMockProvider: false
+            }
+            */
+             console.log("konum  bilgisis")
+             console.log(locations[0]);
+            if(locations===null)
+            return;
+            const location = { "id": parseInt(user_id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
+            Alert.alert(   JSON.stringify(locations[0].latitude));
+            locationPost(location)
+            //   console.log(locations)
+          })
+        } else {
+          Alert.Alert("Konumu Açık Tutunuz")
+        }
+      })
+    } catch (error) {
+      console.log(error)
+      console.log("error")
+    }
+
   }
   const GetAlert = (data) => {
     Alert.alert(

@@ -3,7 +3,7 @@
 
 // Import React and Component
 import React from 'react';
-import {View, Image, TouchableOpacity,Text} from 'react-native';
+import {View, Image, TouchableOpacity,Text,Button} from 'react-native';
 
 const NavigationDrawerHeader = () => {
 //   const toggleDrawer = () => {
@@ -11,8 +11,9 @@ const NavigationDrawerHeader = () => {
 //   };
 
   return (
-    <View style={{flexDirection: 'row'}}>
-      <Text>Merhaba</Text>
+    <View >
+        {/* <Button></Button>
+      <Text>Merhaba</Text> */}
     </View>
   );
 };
