@@ -1,6 +1,8 @@
 import * as  React from 'react'
 import { Button } from 'react-native'
 import Home from './screens/home/Home.js';
+import test from './screens/home/test';
+
 import NavigationDrawerHeader from './screens/NavigationDrawerHeader.js';
 import App from './App'
 import { NavigationContainer } from '@react-navigation/native';
@@ -13,6 +15,8 @@ export default function AppNavigation() {
             <Stack.Navigator screenOptions={{
                
             }}>
+                              {/* <Stack.Screen name="test" component={test}  /> */}
+
                 <Stack.Screen name="Home" component={Home} options={{  
                      title: '',
                      headerStyle: {

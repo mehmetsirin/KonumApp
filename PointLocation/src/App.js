@@ -53,9 +53,9 @@ const   test =() =>{
     }
     let dataToSend = { email: userEmail, password: userPassword };
 
-
-
-    fetch('http://178.18.200.116:90/api/PointList/GetUserPoint?userName=mehmet&pass=mehmet', {
+    var path ="http://178.18.200.116:90/api/PointList/GetUserPoint?userName="+userEmail+"&pass="+userPassword;
+console.log(path);
+    fetch(path, {
       method: 'POST',
       // body: dataToSend,
       headers: {
@@ -66,19 +66,14 @@ const   test =() =>{
     })
       .then((response) => response.json())
       .then((responseJson) => {
-        console.log(responseJson);
         if (responseJson.resultStatus === 0) {
-          console.log(responseJson.data.id)
-
-
-
             AsyncStorage.setItem('user_id', JSON.stringify(responseJson.data.id));
-           navigation.navigate('Home');
+            navigation.navigate('Home',{user_id:responseJson.data.id});
         }
         else {
        Alert.alert("Kullanıc adınız ve şifreniz yanlış")
         }
-     
+
         // If server response message same as Data Matched
         // if (responseJson.status === 'success') {
         //   AsyncStorage.setItem('user_id', responseJson.data.email);
@@ -105,21 +100,22 @@ const   test =() =>{
           justifyContent: 'center',
           alignContent: 'center',
         }}>
-          
+
         <View>
           <KeyboardAvoidingView enabled>
             <View style={{ alignItems: 'center' }}>
-              {/* <Image
-                source={require('../Image/aboutreact.png')}
+              <Image
+                source={require('../src/images/rota.png')}
                 style={{
                   width: '50%',
                   height: 100,
                   resizeMode: 'contain',
                   margin: 30,
+                  // backgroundColor: 'red',
                 }}
-              /> */}
+              />
             </View>
-            
+
             <View style={styles.SectionStyle}>
               <TextInput
                 style={styles.inputStyle}
@@ -165,18 +161,13 @@ const   test =() =>{
               style={styles.buttonStyle}
               activeOpacity={0.5}
               onPress={handleSubmitPress}>
-              <Text style={styles.buttonTextStyle}>LOGIN</Text>
+              <Text style={styles.buttonTextStyle}>Giriş</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.buttonStyle}
-              activeOpacity={0.5}
-              onPress={test}>
-              <Text style={styles.buttonTextStyle}>LOGIN</Text>
-            </TouchableOpacity>
+
             <Text
               style={styles.registerTextStyle}
               onPress={() => navigation.navigate('RegisterScreen')}>
-              New Here ? Register
+              www.rota.net.tr
             </Text>
           </KeyboardAvoidingView>
         </View>
@@ -229,7 +220,7 @@ const styles = StyleSheet.create({
     borderColor: '#dadae8',
   },
   registerTextStyle: {
-    color: '#FFFFFF',
+    color: 'red',
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 14,
