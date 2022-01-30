@@ -17,6 +17,7 @@
     "react-devtools": "^4.23.0",
     "react-native": "0.67.1",
     "react-native-fetch-api": "^3.0.0",
+    "react-native-get-location": "^2.2.1",
     "react-native-location": "^2.5.0",
     "react-native-modal": "^13.0.0",
     "react-native-safe-area-context": "^3.3.2",

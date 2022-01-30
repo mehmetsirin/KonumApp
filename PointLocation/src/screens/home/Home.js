@@ -8,6 +8,7 @@ import ScrollViewExample from './ScrollViewExample.js'
 import RNLocation from 'react-native-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isSearchBarAvailableForCurrentPlatform } from 'react-native-screens';
+
 import Modal from "react-native-modal";
 
 const Home = ({ navigation }) => {
@@ -17,7 +18,6 @@ const Home = ({ navigation }) => {
   const [user_id, setUserId] = useState()
   const [isModalVisible, setModalVisible] = useState(false);
   const [pointName, setPointName] = useState();
-  console.log("Home")
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -31,21 +31,17 @@ const Home = ({ navigation }) => {
   // });
   const pointListGet = (id) => {
     const path = 'http://178.18.200.116:90/api/PointList/GetUserByPointList?userId=' + id;
-    console.log(path);
-
     fetch(path)
       .then(response => response.json())
-      .then(json => { console.log(json.data); setPointList(json.data) })
+      .then(json => {  setPointList(json.data) })
   }
 
 
   if (pointList === null || pointList === undefined) {
     AsyncStorage.getItem("user_id").then(value => {
-      console.log("XXXXXXX:" + JSON.stringify(value));
       setUserId(value);
       pointListGet(value);
     }).done(err => {
-      console.log("merhaba:" + err);
     })
   }
 
@@ -55,16 +51,16 @@ const Home = ({ navigation }) => {
     setPointList();
   }
 
+    
 
   const GetUserId = () => {
     AsyncStorage.getItem("user_id").then(value => {
-      console.log("XXXXXXX:" + JSON.stringify(value));
       setUserId(value);
       return value;
 
     }).done(err => {
       // Alert.alert(err)
-      console.log("merhaba:err" + err + "---" + user_id);
+      console.warn(":err" + err + "---" + user_id);
     })
 
   }
@@ -104,6 +100,7 @@ const Home = ({ navigation }) => {
 
   const locationPost = (location) => {
     console.log("locationPost");
+    
     console.log(location);
     fetch('http://178.18.200.116:90/api/PointList/PointUpdate', {
       method: 'POST',
@@ -115,36 +112,43 @@ const Home = ({ navigation }) => {
     })
       .then((response) => response.json())
       .then((responseJson) => {
+        console.warn("Merhaba Psot=" +   JSON.stringify(responseJson));
+        console.warn("Merhaba Psot=" +   JSON.stringify(location));
 
+           console.log(responseJson);
         pointListGet();
-        // //Hide Loader
-        // setLoading(false);
-        // console.log(responseJson);
-        // // If server response message same as Data Matched
-        // if (responseJson.status === 'success') {
-        //   AsyncStorage.setItem('user_id', responseJson.data.email);
-        //   console.log(responseJson.data.email);
-        //   navigation.replace('DrawerNavigationRoutes');
-        // } else {
-        //   setErrortext(responseJson.msg);
-        //   console.log('Please check your email id or password');
-        // }
+        
       })
       .catch((error) => {
         //Hide Loader
         // setLoading(false);
-        console.error(error);
+        Alert.Alert("Bilinmeyen bir hata oluştu-1")
       });
 
 
   }
 
   const GetLocation = (id) => {
-    console.log("GetLocation")
     try {
 
       RNLocation.configure({
-        distanceFilter: 1.0
+        distanceFilter: 1, // Meters
+        desiredAccuracy: {
+          ios: "best",
+          android: "balancedPowerAccuracy"
+        },
+        // Android only
+        androidProvider: "auto",
+        interval: 5000, // Milliseconds
+        fastestInterval: 10000, // Milliseconds
+        maxWaitTime: 5000, // Milliseconds
+        // iOS Only
+        activityType: "other",
+        allowsBackgroundLocationUpdates: false,
+        headingFilter: 1, // Degrees
+        headingOrientation: "portrait",
+        pausesLocationUpdatesAutomatically: false,
+        showsBackgroundLocationIndicator: false,  
       })
 
       RNLocation.requestPermission({
@@ -155,43 +159,29 @@ const Home = ({ navigation }) => {
       }).then(granted => {
 
         if (granted) {
-          // const aa = RNLocation.getLatestLocation(y => { console.log(y); console.log("aaassa") });
-          // console.log(aa);
-
+       
           RNLocation.subscribeToLocationUpdates(locations => {
-            console.log("GetLocation-2")
-            // console.log(locations)
-
-            /* Example location returned
-            {
-              speed: -1,
-              longitude: -0.1337,
-              latitude: 51.50998,
-              accuracy: 5,
-              heading: -1,
-              altitude: 0,
-              altitudeAccuracy: -1
-              floor: 0
-              timestamp: 1446007304457.029,
-              fromMockProvider: false
-            }
-            */
-            console.log("konum  bilgisis")
-            console.log(locations[0]);
-            if (locations === null)
+            if (locations === null){
+            Alert.alert("Konum ALINAMADI"); 
               return;
-            const location = { "id": parseInt(user_id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
-            Alert.alert(JSON.stringify(locations[0].latitude));
+            }
+            if(locations[0].latitude<1){
+              Alert.alert("Konum Alırken Hata oldu-2")
+             return;
+            }
+          
+            
+            const location = { "id": parseInt(id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
+          
+            
             locationPost(location)
-            //   console.log(locations)
           })
         } else {
           Alert.Alert("Konumu Açık Tutunuz")
         }
       })
     } catch (error) {
-      console.log(error)
-      console.log("error")
+      console.warn(error)
     }
 
   }
@@ -245,13 +235,20 @@ const Home = ({ navigation }) => {
           pointList ===
             null ? <Text>Nokta Yok</Text> :
             pointList?.map((item, index) => (
-              <View key={item.id} style={styles.item}>
+                item.latitude===0?(  <View key={item.id} style={styles.noLocation}>
+                  <Text>{item.pointName}</Text>
+                  <Button  
+                    title="Konum"
+                    onPress={() => GetLocation(item?.id)}
+                  />
+                </View>):(  <View key={item.id} style={styles.item}>
                 <Text>{item.pointName}</Text>
                 <Button  
                   title="Konum"
                   onPress={() => GetLocation(item?.id)}
                 />
-              </View>
+              </View>)
+            
             ))
         }
       </ScrollView>
@@ -265,8 +262,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 30,
-    margin: 2,
+    padding: 20,
+    margin: 1,
+    borderColor: '#2a4944',
+    borderWidth: 1,
+    backgroundColor: 'white'
+  },
+  noLocation: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    margin: 1,
     borderColor: '#2a4944',
     borderWidth: 1,
     backgroundColor: '#d2f7f1'
@@ -275,8 +282,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     // alignItems: 'center',
-    padding: 30,
-    margin: 2,
+    padding: 20,
+    margin: 1,
     borderColor: '#2a4944',
     borderWidth: 1,
     backgroundColor: '#d2f7f1'
