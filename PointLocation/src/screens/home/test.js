@@ -83,20 +83,17 @@ export default class App extends Component {
             }).then(granted => {
       
               if (granted) {
-                // const aa = RNLocation.getLatestLocation(y => { console.log(y); console.log("aaassa") });
-                // console.log(aa);
+               
       
                 RNLocation.subscribeToLocationUpdates(locations => {
                  
-                   console.log(locations)
                 })
               } else {
                 Alert.Alert("Konumu Açık Tutunuz")
               }
             })
           } catch (error) {
-            console.log(error)
-            console.log("error")
+         
           }
 
        }
@@ -115,7 +112,6 @@ export default class App extends Component {
       })
       .catch(ex => {
         const {code, message} = ex;
-        console.warn(code, message);
         if (code === 'CANCELLED') {
           Alert.alert('Location cancelled by user or by another request');
         }

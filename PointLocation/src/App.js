@@ -12,7 +12,7 @@ import {
   Image,
   Keyboard,
   TouchableOpacity,
-  KeyboardAvoidingView,Alert
+  KeyboardAvoidingView, Alert
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import AsyncStorage from '@react-native-community/async-storage';
@@ -28,20 +28,19 @@ const App = ({ navigation }) => {
   const passwordInputRef = createRef();
 
 
-const   test =() =>{
+  const test = () => {
 
-  console.log('test')
-  // AsyncStorage.getItem('user');
+    console.log('test')
+    // AsyncStorage.getItem('user');
     try {
-         AsyncStorage.getItem("user_id").then(value => console.log(value))
-          //  console.log( AsyncStorage.getItem("user_id"))
+      AsyncStorage.getItem("user_id").then(value => console.log(value))
     }
-    catch (err){
+    catch (err) {
       console.log(err)
     }
 
-}
-  const handleSubmitPress =  async () => {
+  }
+  const handleSubmitPress = async () => {
     setErrortext('');
     if (!userEmail) {
       alert('Please fill Email');
@@ -53,8 +52,7 @@ const   test =() =>{
     }
     let dataToSend = { email: userEmail, password: userPassword };
 
-    var path ="http://178.18.200.116:90/api/PointList/GetUserPoint?userName="+userEmail+"&pass="+userPassword;
-console.log(path);
+    var path = "http://178.18.200.116:90/api/PointList/GetUserPoint?userName=" + userEmail + "&pass=" + userPassword;
     fetch(path, {
       method: 'POST',
       // body: dataToSend,
@@ -66,12 +64,14 @@ console.log(path);
     })
       .then((response) => response.json())
       .then((responseJson) => {
+             console.warn(responseJson)
+
         if (responseJson.resultStatus === 0) {
-            AsyncStorage.setItem('user_id', JSON.stringify(responseJson.data.id));
-            navigation.navigate('Home',{user_id:responseJson.data.id});
+          AsyncStorage.setItem('user_id', JSON.stringify(responseJson.data.userID));
+          navigation.navigate('Home', { user_id: responseJson.data.userID });
         }
         else {
-       Alert.alert("Kullanıc adınız ve şifreniz yanlış")
+          Alert.alert("Kullanıc adınız ve şifreniz yanlış")
         }
 
         // If server response message same as Data Matched
@@ -87,7 +87,6 @@ console.log(path);
       .catch((error) => {
         //Hide Loader
         // setLoading(false);
-        console.error(error);
       });
   };
 

@@ -9,29 +9,29 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 export default function AppNavigation() {
-    const Stack = createNativeStackNavigator();
-    return (
-        <NavigationContainer>
-            <Stack.Navigator screenOptions={{
-               
-            }}>
-                              {/* <Stack.Screen name="test" component={test}  /> */}
+  const Stack = createNativeStackNavigator();
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{
 
-                <Stack.Screen name="Home" component={Home} options={{  
-                     title: '',
-                     headerStyle: {
-                       backgroundColor: '#f4511e',
-                     },
-                     headerTintColor: '#fff',
-                     headerTitleStyle: {
-                       fontWeight: 'bold',
-                     }
-         }} />
-                <Stack.Screen name="App" component={App} options={{ headerShown: false }} />
+      }}>
+        {/* <Stack.Screen name="test" component={test}  /> */}
+        <Stack.Screen name="App" component={App} options={{ headerShown: false }} />
 
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
+        <Stack.Screen name="Home" component={Home} options={{
+          title: '',
+          headerStyle: {
+            backgroundColor: '#f4511e',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          }
+        }} />
+
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 

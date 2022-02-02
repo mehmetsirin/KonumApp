@@ -11,8 +11,9 @@ import { isSearchBarAvailableForCurrentPlatform } from 'react-native-screens';
 
 import Modal from "react-native-modal";
 
-const Home = ({ navigation }) => {
-  console.log(navigation);
+const Home = ({ navigation, route }) => {
+  console.log(route.params.user_id);
+
   const [pointList, setPointList] = useState();
   const [count, setCount] = useState()
   const [user_id, setUserId] = useState()
@@ -31,17 +32,20 @@ const Home = ({ navigation }) => {
   // });
   const pointListGet = (id) => {
     const path = 'http://178.18.200.116:90/api/PointList/GetUserByPointList?userId=' + id;
+
     fetch(path)
       .then(response => response.json())
-      .then(json => {  setPointList(json.data) })
+      .then(json => {
+        setPointList(json.data);
+      })
   }
-
 
   if (pointList === null || pointList === undefined) {
     AsyncStorage.getItem("user_id").then(value => {
       setUserId(value);
       pointListGet(value);
     }).done(err => {
+
     })
   }
 
@@ -51,7 +55,7 @@ const Home = ({ navigation }) => {
     setPointList();
   }
 
-    
+
 
   const GetUserId = () => {
     AsyncStorage.getItem("user_id").then(value => {
@@ -60,20 +64,22 @@ const Home = ({ navigation }) => {
 
     }).done(err => {
       // Alert.alert(err)
-      console.warn(":err" + err + "---" + user_id);
     })
 
   }
   useEffect(() => {
+    setUserId(route.params.user_id);
+
+    // console.warn(JSON.stringify(navigation.getParam('itemId', 'NO-ID')));
     navigation.setOptions({
       headerLeft: () => <Button title={"Çıkış"} onPress={logOut} />,
       headerRight: () => (
         <Button onPress={toggleModal} title="Ekle" />
       ),
     });
-    if (user_id === undefined || user_id === null)
+    if (route.params.user_id === undefined || route.params.user_id === null)
       navigation.navigate("App");
-  }, [pointList,isModalVisible])
+  }, [pointList, isModalVisible])
 
 
 
@@ -99,9 +105,7 @@ const Home = ({ navigation }) => {
   }
 
   const locationPost = (location) => {
-    console.log("locationPost");
-    
-    console.log(location);
+
     fetch('http://178.18.200.116:90/api/PointList/PointUpdate', {
       method: 'POST',
       body: JSON.stringify(location),
@@ -112,12 +116,9 @@ const Home = ({ navigation }) => {
     })
       .then((response) => response.json())
       .then((responseJson) => {
-        console.warn("Merhaba Psot=" +   JSON.stringify(responseJson));
-        console.warn("Merhaba Psot=" +   JSON.stringify(location));
 
-           console.log(responseJson);
         pointListGet();
-        
+
       })
       .catch((error) => {
         //Hide Loader
@@ -148,7 +149,7 @@ const Home = ({ navigation }) => {
         headingFilter: 1, // Degrees
         headingOrientation: "portrait",
         pausesLocationUpdatesAutomatically: false,
-        showsBackgroundLocationIndicator: false,  
+        showsBackgroundLocationIndicator: false,
       })
 
       RNLocation.requestPermission({
@@ -159,21 +160,21 @@ const Home = ({ navigation }) => {
       }).then(granted => {
 
         if (granted) {
-       
+
           RNLocation.subscribeToLocationUpdates(locations => {
-            if (locations === null){
-            Alert.alert("Konum ALINAMADI"); 
+            if (locations === null) {
+              Alert.alert("Konum ALINAMADI");
               return;
             }
-            if(locations[0].latitude<1){
+            if (locations[0].latitude < 1) {
               Alert.alert("Konum Alırken Hata oldu-2")
-             return;
+              return;
             }
-          
-            
+
+
             const location = { "id": parseInt(id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
-          
-            
+
+
             locationPost(location)
           })
         } else {
@@ -181,7 +182,6 @@ const Home = ({ navigation }) => {
         }
       })
     } catch (error) {
-      console.warn(error)
     }
 
   }
@@ -220,7 +220,7 @@ const Home = ({ navigation }) => {
 
             </View>
             <View>
-              <Button style={{ backgroundColor:'powderblue'}} onPress={pointSave} title="Kaydet"></Button>
+              <Button style={{ backgroundColor: 'powderblue' }} onPress={pointSave} title="Kaydet"></Button>
 
             </View>
 
@@ -235,20 +235,32 @@ const Home = ({ navigation }) => {
           pointList ===
             null ? <Text>Nokta Yok</Text> :
             pointList?.map((item, index) => (
-                item.latitude===0?(  <View key={item.id} style={styles.noLocation}>
+              item.latitude === 0 ? (<View key={item.id} style={styles.noLocation}>
+                <View style={{ flex:2}}>
                   <Text>{item.pointName}</Text>
-                  <Button  
+                </View>
+                <View>
+                  <Button
                     title="Konum"
                     onPress={() => GetLocation(item?.id)}
                   />
-                </View>):(  <View key={item.id} style={styles.item}>
-                <Text>{item.pointName}</Text>
-                <Button  
-                  title="Konum"
-                  onPress={() => GetLocation(item?.id)}
-                />
-              </View>)
-            
+                </View>
+
+              </View>) : (
+                <View key={item.id} style={styles.item}>
+                  <View style={{ flex: 2 }}>
+                    <Text>{item.pointName}</Text>
+
+                  </View>
+                  <View>
+                    <Button
+                      title="Konum"
+                      onPress={() => GetLocation(item?.id)}
+                    />
+                  </View>
+
+                </View>)
+
             ))
         }
       </ScrollView>
