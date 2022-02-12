@@ -28,18 +28,7 @@ const App = ({ navigation }) => {
   const passwordInputRef = createRef();
 
 
-  const test = () => {
-
-    console.log('test')
-    // AsyncStorage.getItem('user');
-    try {
-      AsyncStorage.getItem("user_id").then(value => console.log(value))
-    }
-    catch (err) {
-      console.log(err)
-    }
-
-  }
+  
   const handleSubmitPress = async () => {
     setErrortext('');
     if (!userEmail) {

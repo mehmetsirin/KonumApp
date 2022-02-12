@@ -105,7 +105,7 @@ const Home = ({ navigation, route }) => {
   }
 
   const locationPost = (location) => {
-
+    console.log( `id:${location} Zaman:${new Date()}` );
     fetch('http://178.18.200.116:90/api/PointList/PointUpdate', {
       method: 'POST',
       body: JSON.stringify(location),
@@ -161,22 +161,30 @@ const Home = ({ navigation, route }) => {
 
         if (granted) {
 
-          RNLocation.subscribeToLocationUpdates(locations => {
-            if (locations === null) {
-              Alert.alert("Konum ALINAMADI");
-              return;
-            }
-            if (locations[0].latitude < 1) {
-              Alert.alert("Konum Alırken Hata oldu-2")
-              return;
-            }
+          console.log( `id:${id} Zaman:${new Date()}` );
+          // ;
+          RNLocation.getLatestLocation().then( item => {
+               console.log( item)
+               const location = { "id": parseInt(id), "latitude":item.latitude, "longitude": item.longitude }
+                locationPost(location)
+          });
+
+          // RNLocation.subscribeToLocationUpdates(locations => {
+          //   if (locations === null) {
+          //     Alert.alert("Konum ALINAMADI");
+          //     return;
+          //   }
+          //   if (locations[0].latitude < 1) {
+          //     Alert.alert("Konum Alırken Hata oldu-2")
+          //     return;
+          //   }
 
 
-            const location = { "id": parseInt(id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
+          //   const location = { "id": parseInt(id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
 
 
-            locationPost(location)
-          })
+          //   locationPost(location)
+          // })
         } else {
           Alert.Alert("Konumu Açık Tutunuz")
         }
@@ -206,7 +214,7 @@ const Home = ({ navigation, route }) => {
         animationOut={'slideOutRight'}>
         <View style={{
           backgroundColor: 'rgba(0,0,0,0)',
-          height: 300,
+          height: 75,
           // width:300
         }}>
           <TextInput

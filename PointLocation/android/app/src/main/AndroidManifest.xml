@@ -9,6 +9,7 @@
       android:icon="@mipmap/rota"
       android:roundIcon="@mipmap/rota"
       android:allowBackup="false"
+      android:usesCleartextTraffic="true"
       android:theme="@style/AppTheme">
       <activity
         android:name=".MainActivity"
