@@ -12,7 +12,6 @@ import { isSearchBarAvailableForCurrentPlatform } from 'react-native-screens';
 import Modal from "react-native-modal";
 
 const Home = ({ navigation, route }) => {
-  console.log(route.params.user_id);
 
   const [pointList, setPointList] = useState();
   const [count, setCount] = useState()
@@ -105,7 +104,6 @@ const Home = ({ navigation, route }) => {
   }
 
   const locationPost = (location) => {
-    console.log( `id:${location} Zaman:${new Date()}` );
     fetch('http://178.18.200.116:90/api/PointList/PointUpdate', {
       method: 'POST',
       body: JSON.stringify(location),
@@ -153,60 +151,39 @@ const Home = ({ navigation, route }) => {
       })
 
       RNLocation.requestPermission({
+         
         ios: "whenInUse",
         android: {
-          detail: "coarse"
+          detail: "fine"
         }
       }).then(granted => {
-
+          console.log("------: "+ granted)
+          //  showAlert()
         if (granted) {
+          console.log( "dddddddd----"+granted)
 
-          console.log( `id:${id} Zaman:${new Date()}` );
-          // ;
           RNLocation.getLatestLocation().then( item => {
-               console.log( item)
-               const location = { "id": parseInt(id), "latitude":item.latitude, "longitude": item.longitude }
+              console.log("sdssds")
+               console.log( "----"+item)
+               if(item!=null) {
+                const location = { "id": parseInt(id), "latitude":item.latitude, "longitude": item.longitude }
                 locationPost(location)
+               }else{
+                 showAlert("Konumunuzu Açın")
+               }
+             
           });
-
-          // RNLocation.subscribeToLocationUpdates(locations => {
-          //   if (locations === null) {
-          //     Alert.alert("Konum ALINAMADI");
-          //     return;
-          //   }
-          //   if (locations[0].latitude < 1) {
-          //     Alert.alert("Konum Alırken Hata oldu-2")
-          //     return;
-          //   }
-
-
-          //   const location = { "id": parseInt(id), "latitude": locations[0].latitude, "longitude": locations[0].longitude };
-
-
-          //   locationPost(location)
-          // })
+        
         } else {
-          Alert.Alert("Konumu Açık Tutunuz")
-        }
+          showAlert("Konum İzni Veriniz")        }
       })
     } catch (error) {
     }
 
   }
-  const GetAlert = (data) => {
-    Alert.alert(
-      "Alert Title",
-      data,
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel"
-        },
-        { text: "OK", onPress: () => console.log("OK Pressed") }
-      ]
-    );
-  }
+  const showAlert = (data) =>
+  Alert.alert( "Konum" ,data)
+
 
   return (
     <View>
